@@ -1,0 +1,11 @@
+Metadata-Version: 2.4
+Name: iris_inference_api
+Version: 0.1.0
+Summary: Production-style API for IRIS dataset
+Requires-Python: >=3.11
+Requires-Dist: gcsfs
+Requires-Dist: joblib
+Requires-Dist: scikit-learn
+Requires-Dist: xgboost
+Requires-Dist: fastapi
+Requires-Dist: uvicorn

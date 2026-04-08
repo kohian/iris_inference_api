@@ -1,0 +1,40 @@
+#tells pip how to build/install your project
+[build-system]
+requires = ["setuptools>=61"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "iris_inference_api"
+version = "0.1.0"
+description = "Production-style API for IRIS dataset"
+requires-python = ">=3.11"
+
+# declare your runtime dependencies here
+dependencies = [
+    "gcsfs",
+    "joblib",
+    "scikit-learn",
+    "xgboost",
+    "fastapi",
+    "uvicorn",
+]
+
+# tells setuptools your package code lives under src/
+[tool.setuptools]
+package-dir = {"" = "src"}
+
+# tells setuptools to find packages inside src/
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+src = ["src"]
+
+[tool.ruff.lint]
+select = ["E", "F", "I"]
+
+[tool.pytest.ini_options]
+pythonpath = ["src"]
+testpaths = ["tests"]

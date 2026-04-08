@@ -1,0 +1,23 @@
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+
+# Virtual environment
+.venv/
+.venv_test/
+
+# Git
+.git
+.gitignore
+.github/
+
+# Development tools
+.vscode/
+
+# Local outputs
+reports/
+# model_artifacts/
+
+# Documentation
+README.md

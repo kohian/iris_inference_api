@@ -1,0 +1,14 @@
+README.md
+pyproject.toml
+src/iris_inference_api/__init__.py
+src/iris_inference_api/batch_async_client.py
+src/iris_inference_api/main.py
+src/iris_inference_api/main_old.py
+src/iris_inference_api/model_loader.py
+src/iris_inference_api/schemas.py
+src/iris_inference_api.egg-info/PKG-INFO
+src/iris_inference_api.egg-info/SOURCES.txt
+src/iris_inference_api.egg-info/dependency_links.txt
+src/iris_inference_api.egg-info/requires.txt
+src/iris_inference_api.egg-info/top_level.txt
+tests/test_api.py

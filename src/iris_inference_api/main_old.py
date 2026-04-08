@@ -1,15 +1,32 @@
-import os
 from contextlib import asynccontextmanager
 
+import gcsfs
+import joblib
 from fastapi import FastAPI, HTTPException, Request
+from pydantic import BaseModel, Field
 
-from iris_inference_api.model_loader import load_model
-from iris_inference_api.schemas import PredictRequest, PredictResponse
+MODEL_PATH = "gs://iris-csv/model_artifacts/logreg.joblib"
 
-MODEL_PATH = os.getenv(
-    "MODEL_PATH",
-    "gs://iris-csv/model_artifacts/logreg.joblib",
-)
+class PredictRequest(BaseModel):
+    features: list[float] = Field(
+        min_length=4,
+        max_length=4,
+        description="Iris features: sepal length, sepal width, petal length, petal width",
+    )
+
+
+class PredictResponse(BaseModel):
+    class_id: int
+    class_name: str
+    confidence: float
+    probabilities: list[float]
+
+
+def load_model(path: str):
+    fs = gcsfs.GCSFileSystem()
+    with fs.open(path, "rb") as f:
+        return joblib.load(f)
+
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -43,6 +60,7 @@ def health(request: Request):
     return {
         "status": "ok",
         "model_loaded": model_loaded,
+        "model_version": request.app.state.model_version,
     }
 
 

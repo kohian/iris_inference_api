@@ -1,0 +1,6 @@
+gcsfs
+joblib
+scikit-learn
+xgboost
+fastapi
+uvicorn
