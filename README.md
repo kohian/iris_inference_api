@@ -6,23 +6,20 @@ This project demonstrates how to package a trained model into a reproducible, de
 
 ---
 
-##  Features
+## Features
 
 * FastAPI-based inference service
-* Supports both **local** and **GCS-based model loading**
+* Supports both local and GCS-based model loading
 * Structured request/response validation using Pydantic
 * Async batch client for concurrent inference testing
 * Dockerized with multi-stage builds (test + production)
-* CI pipeline with:
-
-  * Ruff (linting)
-  * Pytest (API testing)
-* Deployable to **Google Cloud Run**
-* Image stored in **Artifact Registry**
+* CI pipeline with linting, testing, and Docker build/push
+* Deployable to Google Cloud Run
+* Image stored in Artifact Registry
 
 ---
 
-##  Project Structure
+## Project Structure
 
 ```
 iris_inference_api/
@@ -50,7 +47,7 @@ iris_inference_api/
 
 ---
 
-##  Setup
+## Setup
 
 ### 1. Create virtual environment
 
@@ -61,13 +58,27 @@ source .venv/bin/activate   # or .venv\Scripts\activate (Windows)
 
 ### 2. Install dependencies
 
+Runtime dependencies:
+
 ```bash
 pip install -r requirements.txt
 ```
 
+Development dependencies (for testing and linting):
+
+```bash
+pip install -r requirements_dev.txt
+```
+
+Install the package in editable mode:
+
+```bash
+pip install -e .
+```
+
 ---
 
-##  Run Locally
+## Run Locally
 
 ```bash
 uvicorn iris_inference_api.main:app --reload
@@ -79,7 +90,7 @@ API will be available at:
 http://127.0.0.1:8000
 ```
 
-Swagger docs:
+Swagger documentation:
 
 ```
 http://127.0.0.1:8000/docs
@@ -87,7 +98,7 @@ http://127.0.0.1:8000/docs
 
 ---
 
-##  Example Request
+## Example Request
 
 ```json
 POST /predict
@@ -109,7 +120,7 @@ Response:
 
 ---
 
-##  Testing
+## Testing
 
 Run tests locally:
 
@@ -125,7 +136,7 @@ Tests include:
 
 ---
 
-##  Linting
+## Linting
 
 ```bash
 ruff check src tests
@@ -133,16 +144,16 @@ ruff check src tests
 
 ---
 
-##  Docker
+## Docker
 
-### Build (test stage)
+Build test image:
 
 ```bash
 docker build -t iris-test --target test .
 docker run iris-test
 ```
 
-### Build (production)
+Build production image:
 
 ```bash
 docker build -t iris-api --target prod .
@@ -151,14 +162,59 @@ docker run -p 8080:8080 iris-api
 
 ---
 
-##  Cloud Deployment
+## CI/CD (GitHub Actions)
 
-### Build & Push via GitHub Actions
+This project includes a CI/CD pipeline defined in:
 
-* Uses Workload Identity Federation (no service account keys)
-* Pushes image to Google Artifact Registry
+```
+.github/workflows/build_docker.yml
+```
 
-### Deploy to Cloud Run
+### Pipeline Overview
+
+The workflow consists of two main stages:
+
+### 1. Lint and Test
+
+* Builds the test stage of the Docker image
+* Uses a local model from `model_artifacts/` to avoid external dependencies
+* Runs:
+
+```bash
+ruff check src tests
+pytest
+```
+
+This ensures:
+
+* code quality through linting
+* API correctness through testing
+* consistency between local and container environments
+
+### 2. Build and Push
+
+After tests pass:
+
+* Authenticates to GCP using Workload Identity Federation
+* Builds the production Docker image
+* Pushes the image to Artifact Registry
+
+Image format:
+
+```
+us-central1-docker.pkg.dev/<PROJECT>/<REPO>/iris-api
+```
+
+Tags:
+
+* commit SHA
+* latest
+
+---
+
+## Cloud Deployment
+
+Deploy to Cloud Run:
 
 ```bash
 gcloud run deploy iris-api \
@@ -170,7 +226,7 @@ gcloud run deploy iris-api \
 
 ---
 
-##  Environment Variables
+## Environment Variables
 
 | Variable   | Description                         |
 | ---------- | ----------------------------------- |
@@ -178,32 +234,22 @@ gcloud run deploy iris-api \
 
 ---
 
-##  Design Decisions
+## Design Decisions
 
-### Model Loading Abstraction
-
+Model Loading Abstraction
 Supports both local and GCS paths, enabling flexible deployment across environments.
 
-### FastAPI Lifespan
-
+FastAPI Lifespan
 Model is loaded once at startup to avoid repeated loading during inference.
 
-### Multi-stage Docker
-
+Multi-stage Docker
 Separates test and production images to keep production lightweight.
 
-### CI/CD Pipeline
-
+CI/CD Pipeline
 Docker-based testing ensures consistency between local and deployment environments.
 
 ---
 
-##  Author
+## Notes
 
-Ian Koh
-
----
-
-##  Notes
-
-This project is intentionally over-engineered relative to the Iris dataset to demonstrate production-ready ML system design rather than model complexity.
+This project is intentionally structured to demonstrate production-ready ML system design rather than model complexity.
